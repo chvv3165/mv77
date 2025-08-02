@@ -17,39 +17,41 @@ func _physics_process(delta: float) -> void:
 	# Update dash cooldown timer
 	if dash_cooldown_timer > 0:
 		dash_cooldown_timer -= delta
-	
+
 	# Handle dash input
 	if Input.is_action_just_pressed("dash") and dash_cooldown_timer <= 0 and not is_dashing:
 		start_dash()
-	
-	# Handle dash logic
-	if is_dashing:
-		handle_dash(delta)
-	else:
-		handle_normal_movement(delta)
-	
-	move_and_slide()
+
+        # Handle dash logic
+        if is_dashing:
+                handle_dash(delta)
+        else:
+                handle_normal_movement(delta)
+
+        handle_attack_input()
+
+        move_and_slide()
 
 func start_dash() -> void:
 	# Get dash direction from input or use facing direction
 	var input_direction := Input.get_vector("move_left", "move_right", "ui_up", "ui_down")
-	
+
 	if input_direction != Vector2.ZERO:
 		dash_direction = input_direction.normalized()
 	else:
 		# If no input, dash in the direction player was last moving
 		dash_direction = Vector2(sign(velocity.x), 0) if velocity.x != 0 else Vector2.RIGHT
-	
+
 	is_dashing = true
 	dash_timer = dash_duration
 	dash_cooldown_timer = dash_cooldown
 
 func handle_dash(delta: float) -> void:
 	dash_timer -= delta
-	
+
 	# Apply dash velocity
 	velocity = dash_direction * dash_speed
-	
+
 	# End dash when timer expires
 	if dash_timer <= 0:
 		is_dashing = false
@@ -61,13 +63,18 @@ func handle_normal_movement(delta: float) -> void:
 	if not is_on_floor():
 		velocity.y += gravity * delta
 
-	# Handle jump
-	if Input.is_action_just_pressed("jump") and is_on_floor():
-		velocity.y = jump_velocity
+        # Handle jump
+        if Input.is_action_just_pressed("jump") and is_on_floor():
+                velocity.y = jump_velocity
 
-	# Get input direction for left/right movement
+        # Get input direction for left/right movement
         var direction := Input.get_axis("move_left", "move_right")
         if direction != 0:
                 velocity.x = direction * speed
         else:
                 velocity.x = move_toward(velocity.x, 0, speed * delta)
+
+func handle_attack_input() -> void:
+        if Input.is_action_just_pressed("attack"):
+                # TODO: Implement attack logic
+                pass
