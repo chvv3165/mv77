@@ -1,5 +1,7 @@
 extends CharacterBody2D
 
+const Weapon := preload("res://scripts/weapon.gd")
+
 @export var speed: float = 300.0
 @export var jump_velocity: float = -400.0
 @export var dash_speed: float = 900.0
@@ -12,23 +14,29 @@ var is_dashing: bool = false
 var dash_timer: float = 0.0
 var dash_cooldown_timer: float = 0.0
 var dash_direction: Vector2 = Vector2.ZERO
+var weapon: Node
+
+func _ready() -> void:
+	weapon = Weapon.new()
+	add_child(weapon)
 
 func _physics_process(delta: float) -> void:
 	# Update dash cooldown timer
 	if dash_cooldown_timer > 0:
 		dash_cooldown_timer -= delta
-	
+
 	# Handle dash input
 	if Input.is_action_just_pressed("dash") and dash_cooldown_timer <= 0 and not is_dashing:
 		start_dash()
-	
+
 	# Handle dash logic
 	if is_dashing:
 		handle_dash(delta)
 	else:
 		handle_normal_movement(delta)
-	
+
 	move_and_slide()
+	handle_attack_input()
 
 func start_dash() -> void:
 	# Get dash direction from input or use facing direction
@@ -71,3 +79,11 @@ func handle_normal_movement(delta: float) -> void:
 		velocity.x = direction * speed
 	else:
 		velocity.x = move_toward(velocity.x, 0, speed)
+
+func handle_attack_input() -> void:
+	if Input.is_action_just_pressed("quick_attack"):
+		weapon.quick_attack()
+	elif Input.is_action_just_pressed("heavy_attack"):
+		weapon.heavy_attack()
+	elif Input.is_action_just_pressed("special_attack"):
+		weapon.special_attack()
