@@ -66,8 +66,8 @@ func handle_normal_movement(delta: float) -> void:
 		velocity.y = jump_velocity
 
 	# Get input direction for left/right movement
-	var direction := Input.get_axis("move_left", "move_right")
-	if direction != 0:
-		velocity.x = direction * speed
-	else:
-		velocity.x = move_toward(velocity.x, 0, speed)
+        var direction := Input.get_axis("move_left", "move_right")
+        if direction != 0:
+                velocity.x = direction * speed
+        else:
+                velocity.x = move_toward(velocity.x, 0, speed * delta)
